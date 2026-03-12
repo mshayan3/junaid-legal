@@ -24,9 +24,20 @@ for dir_path in [DATA_DIR, PDF_DIR, DB_DIR, CHROMA_DIR, EXPORTS_DIR]:
 SQLITE_DB_PATH = DB_DIR / "app.db"
 
 # OpenAI settings
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+def get_secret(key, default=""):
+    """Get secret from streamlit secrets or environment variables"""
+    try:
+        import streamlit as st
+        # Check if we're in a streamlit app and key exists in secrets
+        if hasattr(st, "secrets") and key in st.secrets:
+            return st.secrets[key]
+    except Exception:
+        pass
+    return os.getenv(key, default)
+
+OPENAI_API_KEY = get_secret("OPENAI_API_KEY")
+OPENAI_MODEL = get_secret("OPENAI_MODEL", "gpt-4o-mini")
+EMBEDDING_MODEL = get_secret("EMBEDDING_MODEL", "text-embedding-3-small")
 
 # Chunking settings
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "1000"))
